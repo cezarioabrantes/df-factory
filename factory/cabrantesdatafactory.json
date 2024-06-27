@@ -1,0 +1,9 @@
+{
+	"name": "cabrantesdatafactory",
+	"location": "brazilsouth",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "01b66441-ccde-4c90-a932-1357ae5db7fd",
+		"tenantId": "9b01d59c-9871-4c7c-86a6-b214e4bb928e"
+	}
+}
