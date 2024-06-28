@@ -1,0 +1,4354 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "cabrantesdatafactory"
+		},
+		"appdb_service_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'appdb_service'"
+		},
+		"appvm_server_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'appvm_server'"
+		},
+		"cabrantesdatalake_service_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'cabrantesdatalake_service'"
+		},
+		"cabrantesworkspace_sqlpool_service_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'cabrantesworkspace_sqlpool_service'"
+		},
+		"appvm_server_properties_typeProperties_host": {
+			"type": "string",
+			"defaultValue": "D:\\nginx-1.26.1\\logs"
+		},
+		"appvm_server_properties_typeProperties_userId": {
+			"type": "string",
+			"defaultValue": "cabrantes"
+		},
+		"cabrantesdatalake_service_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://cabrantesdatalakegen2.dfs.core.windows.net/"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/01-Copy-To-logdata')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Copy_yg8",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [
+							{
+								"name": "Source",
+								"value": "csv//Log.csv"
+							},
+							{
+								"name": "Destination",
+								"value": "dbo.logdata"
+							}
+						],
+						"typeProperties": {
+							"source": {
+								"type": "DelimitedTextSource",
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings",
+									"skipLineCount": 0
+								}
+							},
+							"sink": {
+								"type": "SqlDWSink",
+								"writeBehavior": "Insert"
+							},
+							"enableStaging": false,
+							"validateDataConsistency": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "Correlation id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "Correlation id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "Operation name",
+											"type": "String"
+										},
+										"sink": {
+											"name": "Operation name",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "Status",
+											"type": "String"
+										},
+										"sink": {
+											"name": "Status",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "Event category",
+											"type": "String"
+										},
+										"sink": {
+											"name": "Event category",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "Level",
+											"type": "String"
+										},
+										"sink": {
+											"name": "Level",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "Time",
+											"type": "String"
+										},
+										"sink": {
+											"name": "Time",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "Subscription",
+											"type": "String"
+										},
+										"sink": {
+											"name": "Subscription",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "Event initiated by",
+											"type": "String"
+										},
+										"sink": {
+											"name": "Event initiated by",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "Resource type",
+											"type": "String"
+										},
+										"sink": {
+											"name": "Resource type",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "Resource group",
+											"type": "String"
+										},
+										"sink": {
+											"name": "Resource group",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "Resource",
+											"type": "String"
+										},
+										"sink": {
+											"name": "Resource",
+											"type": "String"
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "SourceDataset_yg8",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DestinationDataset_yg8",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": [],
+				"lastPublishTime": "2024-06-26T10:40:43Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/SourceDataset_yg8')]",
+				"[concat(variables('factoryId'), '/datasets/DestinationDataset_yg8')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/02-Copy-To-Parquet')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "CopyDataToParquet",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "DelimitedTextSource",
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings"
+								}
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "Correlation id",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "Correlationid",
+											"physicalType": "UTF8"
+										}
+									},
+									{
+										"source": {
+											"name": "Operation name",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "Operationname",
+											"physicalType": "UTF8"
+										}
+									},
+									{
+										"source": {
+											"name": "Status",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "Status",
+											"type": "String",
+											"physicalType": "UTF8"
+										}
+									},
+									{
+										"source": {
+											"name": "Event category",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "Eventcategory",
+											"physicalType": "UTF8"
+										}
+									},
+									{
+										"source": {
+											"name": "Level",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "Level",
+											"type": "String",
+											"physicalType": "UTF8"
+										}
+									},
+									{
+										"source": {
+											"name": "Time",
+											"type": "DateTime",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "Time",
+											"type": "String",
+											"physicalType": "UTF8"
+										}
+									},
+									{
+										"source": {
+											"name": "Subscription",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "Subscription",
+											"type": "String",
+											"physicalType": "UTF8"
+										}
+									},
+									{
+										"source": {
+											"name": "Event initiated by",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "Eventinitiatedby",
+											"physicalType": "UTF8"
+										}
+									},
+									{
+										"source": {
+											"name": "Resource type",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "Resourcetype",
+											"physicalType": "UTF8"
+										}
+									},
+									{
+										"source": {
+											"name": "Resource group",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "Resourcegroup",
+											"physicalType": "UTF8"
+										}
+									},
+									{
+										"source": {
+											"name": "Resource",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "Resource",
+											"type": "String",
+											"physicalType": "UTF8"
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "SourceDataset_yg8",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "logdata_parquet",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					},
+					{
+						"name": "CopyDataToDedicatedSQLPool",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "CopyDataToParquet",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "ParquetSource",
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true,
+									"wildcardFileName": "*.parquet",
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "ParquetReadSettings"
+								}
+							},
+							"sink": {
+								"type": "SqlDWSink",
+								"allowCopyCommand": true,
+								"copyCommandSettings": {},
+								"disableMetricsCollection": false
+							},
+							"enableStaging": true,
+							"stagingSettings": {
+								"linkedServiceName": {
+									"referenceName": "cabrantesdatalake_service",
+									"type": "LinkedServiceReference"
+								},
+								"path": "staging"
+							},
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "Correlationid",
+											"type": "String"
+										},
+										"sink": {
+											"name": "Correlationid",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "Operationname",
+											"type": "String"
+										},
+										"sink": {
+											"name": "Operationname",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "Status",
+											"type": "String"
+										},
+										"sink": {
+											"name": "Status",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "Eventcategory",
+											"type": "String"
+										},
+										"sink": {
+											"name": "Eventcategory",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "Level",
+											"type": "String"
+										},
+										"sink": {
+											"name": "Level",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "Time",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "Time",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "Subscription",
+											"type": "String"
+										},
+										"sink": {
+											"name": "Subscription",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "Eventinitiatedby",
+											"type": "String"
+										},
+										"sink": {
+											"name": "Eventinitiatedby",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "Resourcetype",
+											"type": "String"
+										},
+										"sink": {
+											"name": "Resourcetype",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "Resourcegroup",
+											"type": "String"
+										},
+										"sink": {
+											"name": "Resourcegroup",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "Resource",
+											"type": "String"
+										},
+										"sink": {
+											"name": "Resource",
+											"type": "String"
+										}
+									}
+								]
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "logdata_parquet",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "dedicatedsqlpool_logdata_parquet",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": [],
+				"lastPublishTime": "2024-06-27T14:44:14Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/SourceDataset_yg8')]",
+				"[concat(variables('factoryId'), '/datasets/logdata_parquet')]",
+				"[concat(variables('factoryId'), '/datasets/dedicatedsqlpool_logdata_parquet')]",
+				"[concat(variables('factoryId'), '/linkedServices/cabrantesdatalake_service')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/03-Copy-UsingQuery')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Copy_v1k",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [
+							{
+								"name": "Source",
+								"value": "."
+							},
+							{
+								"name": "Destination",
+								"value": "dbo.FactSales"
+							}
+						],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": "SELECT dt.[ProductID],dt.[SalesOrderID],dt.[OrderQty],dt.[UnitPrice],hd.[OrderDate],hd.[CustomerID],hd.[TaxAmt]\r\n  FROM [SalesLT].[SalesOrderDetail] dt\r\n  LEFT JOIN [SalesLT].[SalesOrderHeader] hd\r\n  ON dt.[SalesOrderID]=hd.[SalesOrderID]",
+								"partitionOption": "None"
+							},
+							"sink": {
+								"type": "SqlDWSink",
+								"writeBehavior": "Insert"
+							},
+							"enableStaging": false,
+							"validateDataConsistency": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "ProductID",
+											"type": "Int32",
+											"physicalType": "int"
+										},
+										"sink": {
+											"name": "ProductID",
+											"type": "Int32",
+											"physicalType": "int"
+										}
+									},
+									{
+										"source": {
+											"name": "SalesOrderID",
+											"type": "Int32",
+											"physicalType": "int"
+										},
+										"sink": {
+											"name": "SalesOrderID",
+											"type": "Int32",
+											"physicalType": "int"
+										}
+									},
+									{
+										"source": {
+											"name": "CustomerID",
+											"type": "Int32",
+											"physicalType": "int"
+										},
+										"sink": {
+											"name": "CustomerID",
+											"type": "Int32",
+											"physicalType": "int"
+										}
+									},
+									{
+										"source": {
+											"name": "OrderQty",
+											"type": "Int16",
+											"physicalType": "smallint"
+										},
+										"sink": {
+											"name": "OrderQty",
+											"type": "Int16",
+											"physicalType": "smallint"
+										}
+									},
+									{
+										"source": {
+											"name": "UnitPrice",
+											"type": "Decimal",
+											"physicalType": "money",
+											"scale": 4,
+											"precision": 19
+										},
+										"sink": {
+											"name": "UnitPrice",
+											"type": "Decimal",
+											"physicalType": "money",
+											"scale": 4,
+											"precision": 19
+										}
+									},
+									{
+										"source": {
+											"name": "OrderDate",
+											"type": "DateTime",
+											"physicalType": "datetime"
+										},
+										"sink": {
+											"name": "OrderDate",
+											"type": "DateTime",
+											"physicalType": "datetime"
+										}
+									},
+									{
+										"source": {
+											"name": "TaxAmt",
+											"type": "Decimal",
+											"physicalType": "money",
+											"scale": 4,
+											"precision": 19
+										},
+										"sink": {
+											"name": "TaxAmt",
+											"type": "Decimal",
+											"physicalType": "money",
+											"scale": 4,
+											"precision": 19
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "SourceDataset_v1k",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DestinationDataset_v1k",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": [],
+				"lastPublishTime": "2024-06-26T11:50:55Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/SourceDataset_v1k')]",
+				"[concat(variables('factoryId'), '/datasets/DestinationDataset_v1k')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/04_MappingDataFlow_FactSales')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "DataFlowFactSales",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "01_DataFlow_FactSales",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"SalesOrderDetailStream": {},
+									"SalesOrderHeaderStream": {},
+									"FactSalesStream": {}
+								}
+							},
+							"staging": {
+								"linkedService": {
+									"referenceName": "cabrantesdatalake_service",
+									"type": "LinkedServiceReference"
+								},
+								"folderPath": "staging"
+							},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": [],
+				"lastPublishTime": "2024-06-26T14:56:44Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/01_DataFlow_FactSales')]",
+				"[concat(variables('factoryId'), '/linkedServices/cabrantesdatalake_service')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/05-MappingDataFlow_Dim')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "DataFlowDimension",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "02_DataFlow_Dim",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"CustomerStream": {},
+									"ProductStream": {},
+									"ProductModelStream": {},
+									"ProductCategoryStream": {},
+									"GetMaxCustomerSK": {},
+									"DimProductLatest": {},
+									"DimCustomer": {},
+									"DimProductStream": {},
+									"CustomerSKSink": {}
+								}
+							},
+							"staging": {
+								"linkedService": {
+									"referenceName": "cabrantesdatalake_service",
+									"type": "LinkedServiceReference"
+								},
+								"folderPath": "staging"
+							},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine",
+							"sourceStagingConcurrency": 1
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": [],
+				"lastPublishTime": "2024-06-26T21:51:37Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/02_DataFlow_Dim')]",
+				"[concat(variables('factoryId'), '/linkedServices/cabrantesdatalake_service')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/06-Copy-Logdata-Filter')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "dfFilter",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "03_DataFlow_logdata",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"LogdataParquetStream": {},
+									"logdataparquetpooldbstream": {}
+								}
+							},
+							"staging": {
+								"linkedService": {
+									"referenceName": "cabrantesdatalake_service",
+									"type": "LinkedServiceReference"
+								},
+								"folderPath": "staging"
+							},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": [],
+				"lastPublishTime": "2024-06-27T14:45:43Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/03_DataFlow_logdata')]",
+				"[concat(variables('factoryId'), '/linkedServices/cabrantesdatalake_service')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/07-Parquet_Json')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "dfJson",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "04_DataFlow_JSON",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"LogParquetStream": {},
+									"JsonStream": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					},
+					{
+						"name": "CopyOntoSQLPool",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "dfJson",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "JsonSource",
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true,
+									"wildcardFileName": "*.json",
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "JsonReadSettings"
+								}
+							},
+							"sink": {
+								"type": "SqlDWSink",
+								"writeBehavior": "Insert",
+								"sqlWriterUseTableLock": false
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"path": "$['Correlationid']"
+										},
+										"sink": {
+											"name": "Correlationid",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['Operationname']"
+										},
+										"sink": {
+											"name": "Operationname",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['Status']"
+										},
+										"sink": {
+											"name": "Status",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['Eventcategory']"
+										},
+										"sink": {
+											"name": "Eventcategory",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['Level']"
+										},
+										"sink": {
+											"name": "Level",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['Time']"
+										},
+										"sink": {
+											"name": "Time",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"path": "$['Subscription']"
+										},
+										"sink": {
+											"name": "Subscription",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['Eventinitiatedby']"
+										},
+										"sink": {
+											"name": "Eventinitiatedby",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['Resourcetype']"
+										},
+										"sink": {
+											"name": "Resourcetype",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['Resourcegroup']"
+										},
+										"sink": {
+											"name": "Resourcegroup",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['Resource']"
+										},
+										"sink": {
+											"name": "Resource",
+											"type": "String"
+										}
+									}
+								]
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "LogDataJson",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "dedicatedsqlpool_logdata_parquet",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": [],
+				"lastPublishTime": "2024-06-27T15:22:35Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/04_DataFlow_JSON')]",
+				"[concat(variables('factoryId'), '/datasets/LogDataJson')]",
+				"[concat(variables('factoryId'), '/datasets/dedicatedsqlpool_logdata_parquet')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/08-JsonArrays')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "dfJsonArrays",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "05-DataFlow_JsonArrays",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"CustomerSourceJson": {},
+									"CustomerSQLPool": {}
+								}
+							},
+							"staging": {
+								"linkedService": {
+									"referenceName": "cabrantesdatalake_service",
+									"type": "LinkedServiceReference"
+								},
+								"folderPath": "staging"
+							},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": [],
+				"lastPublishTime": "2024-06-27T15:36:09Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/05-DataFlow_JsonArrays')]",
+				"[concat(variables('factoryId'), '/linkedServices/cabrantesdatalake_service')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/09-CopyAccessLog')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "CopyNginxData",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "BinarySource",
+								"storeSettings": {
+									"type": "FileServerReadSettings",
+									"recursive": true
+								},
+								"formatSettings": {
+									"type": "BinaryReadSettings"
+								}
+							},
+							"sink": {
+								"type": "BinarySink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								}
+							},
+							"enableStaging": false
+						},
+						"inputs": [
+							{
+								"referenceName": "FileServer",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "Binary1",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": [],
+				"lastPublishTime": "2024-06-27T21:19:04Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/FileServer')]",
+				"[concat(variables('factoryId'), '/datasets/Binary1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/10-ConvertAccessLog')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "dtAccess",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "dataflow_nginx",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"nginxstream": {},
+									"ServerLogsStream": {}
+								}
+							},
+							"staging": {
+								"linkedService": {
+									"referenceName": "cabrantesdatalake_service",
+									"type": "LinkedServiceReference"
+								},
+								"folderPath": "staging"
+							},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": [],
+				"lastPublishTime": "2024-06-27T21:37:29Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/dataflow_nginx')]",
+				"[concat(variables('factoryId'), '/linkedServices/cabrantesdatalake_service')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/11-SplitLogData')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "dfSplitLogData",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "dataflow_splitlogdata",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"logparquestream": {},
+									"logdatastream": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": [],
+				"lastPublishTime": "2024-06-27T22:14:23Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/dataflow_splitlogdata')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/12-WebPipeline')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Web1",
+						"type": "WebActivity",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 5,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"method": "GET",
+							"headers": {},
+							"url": "https://cabrantesdatalake.blob.core.windows.net/csv/Customer/Customer01.csv"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": [],
+				"lastPublishTime": "2024-06-27T22:52:29Z"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/13-Metadata')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "GetMetadataBlobs",
+						"type": "GetMetadata",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataset": {
+								"referenceName": "DimCustomerCSVMetadata",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"fieldList": [
+								"childItems"
+							],
+							"storeSettings": {
+								"type": "AzureBlobFSReadSettings",
+								"recursive": true,
+								"enablePartitionDiscovery": false
+							},
+							"formatSettings": {
+								"type": "DelimitedTextReadSettings"
+							}
+						}
+					},
+					{
+						"name": "ForEachFile",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "GetMetadataBlobs",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('GetMetadataBlobs').output.childItems",
+								"type": "Expression"
+							},
+							"activities": [
+								{
+									"name": "CopyDimCustomer",
+									"type": "Copy",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "DelimitedTextSource",
+											"storeSettings": {
+												"type": "AzureBlobFSReadSettings",
+												"recursive": true,
+												"enablePartitionDiscovery": false
+											},
+											"formatSettings": {
+												"type": "DelimitedTextReadSettings"
+											}
+										},
+										"sink": {
+											"type": "SqlDWSink",
+											"writeBehavior": "Insert",
+											"sqlWriterUseTableLock": false
+										},
+										"enableStaging": false,
+										"translator": {
+											"type": "TabularTranslator",
+											"typeConversion": true,
+											"typeConversionSettings": {
+												"allowDataTruncation": true,
+												"treatBooleanAsNumber": false
+											}
+										}
+									},
+									"inputs": [
+										{
+											"referenceName": "DimCustomerCSVCopy",
+											"type": "DatasetReference",
+											"parameters": {
+												"filename": {
+													"value": "@item().Name",
+													"type": "Expression"
+												}
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "DimCustomerSQLPool",
+											"type": "DatasetReference",
+											"parameters": {}
+										}
+									]
+								}
+							]
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"variables": {
+					"CompanyName": {
+						"type": "String"
+					},
+					"SalesPerson": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"lastPublishTime": "2024-06-27T23:54:05Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/DimCustomerCSVMetadata')]",
+				"[concat(variables('factoryId'), '/datasets/DimCustomerCSVCopy')]",
+				"[concat(variables('factoryId'), '/datasets/DimCustomerSQLPool')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/14-StoredProcedure')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Stored procedure1",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[dbo].[GetCustomerDetails]",
+							"storedProcedureParameters": {
+								"CustomerID": {
+									"value": "277",
+									"type": "Int32"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "cabrantesworkspace_sqlpool_service",
+							"type": "LinkedServiceReference"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": [],
+				"lastPublishTime": "2024-06-27T23:32:40Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/cabrantesworkspace_sqlpool_service')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/15-Lookup')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "LookupStoreProcedure",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlDWSource",
+								"sqlReaderStoredProcedureName": "[[dbo].[GetCustomerDetails]",
+								"storedProcedureParameters": {
+									"CustomerID": {
+										"type": "Int32",
+										"value": "277"
+									}
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "DimCustomerTable",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						}
+					},
+					{
+						"name": "VariableCompanyName",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "LookupStoreProcedure",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "CompanyName",
+							"value": {
+								"value": "@activity('LookupStoreProcedure').output.firstRow.CompanyName",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "VariableSalesPerson",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "LookupStoreProcedure",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "SalesPerson",
+							"value": {
+								"value": "@activity('LookupStoreProcedure').output.firstRow.SalesPerson",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"variables": {
+					"CompanyName": {
+						"type": "String"
+					},
+					"SalesPerson": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"lastPublishTime": "2024-06-27T23:39:57Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/DimCustomerTable')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Binary1')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "cabrantesdatalake_service",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileSystem": "nginx"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/cabrantesdatalake_service')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/CustomerCSV')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "cabrantesdatalake_service",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "Customer",
+						"fileSystem": "csv"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "CustomerID",
+						"type": "String"
+					},
+					{
+						"name": "NameStyle",
+						"type": "String"
+					},
+					{
+						"name": "Title",
+						"type": "String"
+					},
+					{
+						"name": "FirstName",
+						"type": "String"
+					},
+					{
+						"name": "MiddleName",
+						"type": "String"
+					},
+					{
+						"name": "LastName",
+						"type": "String"
+					},
+					{
+						"name": "Suffix",
+						"type": "String"
+					},
+					{
+						"name": "CompanyName",
+						"type": "String"
+					},
+					{
+						"name": "SalesPerson",
+						"type": "String"
+					},
+					{
+						"name": "EmailAddress",
+						"type": "String"
+					},
+					{
+						"name": "Phone",
+						"type": "String"
+					},
+					{
+						"name": "PasswordHash",
+						"type": "String"
+					},
+					{
+						"name": "PasswordSalt",
+						"type": "String"
+					},
+					{
+						"name": "rowguid",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/cabrantesdatalake_service')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/CustomerJson')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "cabrantesdatalake_service",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Json",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "customer.json",
+						"folderPath": "Customer",
+						"fileSystem": "json"
+					}
+				},
+				"schema": {
+					"type": "object",
+					"properties": {
+						"customerid": {
+							"type": "integer"
+						},
+						"customername": {
+							"type": "string"
+						},
+						"registered": {
+							"type": "boolean"
+						},
+						"courses": {
+							"type": "array",
+							"items": {
+								"type": "string"
+							}
+						},
+						"details": {
+							"type": "object",
+							"properties": {
+								"mobile": {
+									"type": "string"
+								},
+								"city": {
+									"type": "string"
+								}
+							}
+						}
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/cabrantesdatalake_service')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/CustomerJsonTable')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "cabrantesworkspace_sqlpool_service",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "CustomerID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "CustomerName",
+						"type": "varchar"
+					},
+					{
+						"name": "Registered",
+						"type": "bit"
+					},
+					{
+						"name": "Courses",
+						"type": "varchar"
+					},
+					{
+						"name": "Mobile",
+						"type": "varchar"
+					},
+					{
+						"name": "City",
+						"type": "varchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "Customercourse"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/cabrantesworkspace_sqlpool_service')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/CustomerTable')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "appdb_service",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "CustomerID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "NameStyle",
+						"type": "bit"
+					},
+					{
+						"name": "Title",
+						"type": "nvarchar"
+					},
+					{
+						"name": "FirstName",
+						"type": "nvarchar"
+					},
+					{
+						"name": "MiddleName",
+						"type": "nvarchar"
+					},
+					{
+						"name": "LastName",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Suffix",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CompanyName",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SalesPerson",
+						"type": "nvarchar"
+					},
+					{
+						"name": "EmailAddress",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Phone",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PasswordHash",
+						"type": "varchar"
+					},
+					{
+						"name": "PasswordSalt",
+						"type": "varchar"
+					},
+					{
+						"name": "rowguid",
+						"type": "uniqueidentifier"
+					},
+					{
+						"name": "ModifiedDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "SalesLT",
+					"table": "Customer"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/appdb_service')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DelimitedText1')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "cabrantesdatalake_service",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "Log.csv",
+						"fileSystem": "csv"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/cabrantesdatalake_service')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DestinationDataset_v1k')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "cabrantesworkspace_sqlpool_service",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "ProductID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "SalesOrderID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "CustomerID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "OrderQty",
+						"type": "smallint",
+						"precision": 5
+					},
+					{
+						"name": "UnitPrice",
+						"type": "money",
+						"precision": 19,
+						"scale": 4
+					},
+					{
+						"name": "OrderDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "TaxAmt",
+						"type": "money",
+						"precision": 19,
+						"scale": 4
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "FactSales"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/cabrantesworkspace_sqlpool_service')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DestinationDataset_yg8')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "cabrantesworkspace_sqlpool_service",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "Correlation id",
+						"type": "varchar"
+					},
+					{
+						"name": "Operation name",
+						"type": "varchar"
+					},
+					{
+						"name": "Status",
+						"type": "varchar"
+					},
+					{
+						"name": "Event category",
+						"type": "varchar"
+					},
+					{
+						"name": "Level",
+						"type": "varchar"
+					},
+					{
+						"name": "Time",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "Subscription",
+						"type": "varchar"
+					},
+					{
+						"name": "Event initiated by",
+						"type": "varchar"
+					},
+					{
+						"name": "Resource type",
+						"type": "varchar"
+					},
+					{
+						"name": "Resource group",
+						"type": "varchar"
+					},
+					{
+						"name": "Resource",
+						"type": "varchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "logdata"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/cabrantesworkspace_sqlpool_service')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DimCustomerCSVCopy')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "cabrantesdatalake_service",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"filename": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": {
+							"value": "@dataset().filename",
+							"type": "Expression"
+						},
+						"folderPath": "Customer",
+						"fileSystem": "csv"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "CustomerID",
+						"type": "String"
+					},
+					{
+						"name": "NameStyle",
+						"type": "String"
+					},
+					{
+						"name": "Title",
+						"type": "String"
+					},
+					{
+						"name": "FirstName",
+						"type": "String"
+					},
+					{
+						"name": "MiddleName",
+						"type": "String"
+					},
+					{
+						"name": "LastName",
+						"type": "String"
+					},
+					{
+						"name": "Suffix",
+						"type": "String"
+					},
+					{
+						"name": "CompanyName",
+						"type": "String"
+					},
+					{
+						"name": "SalesPerson",
+						"type": "String"
+					},
+					{
+						"name": "EmailAddress",
+						"type": "String"
+					},
+					{
+						"name": "Phone",
+						"type": "String"
+					},
+					{
+						"name": "PasswordHash",
+						"type": "String"
+					},
+					{
+						"name": "PasswordSalt",
+						"type": "String"
+					},
+					{
+						"name": "rowguid",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/cabrantesdatalake_service')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DimCustomerCSVMetadata')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "cabrantesdatalake_service",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "Customer",
+						"fileSystem": "csv"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "CustomerID",
+						"type": "String"
+					},
+					{
+						"name": "NameStyle",
+						"type": "String"
+					},
+					{
+						"name": "Title",
+						"type": "String"
+					},
+					{
+						"name": "FirstName",
+						"type": "String"
+					},
+					{
+						"name": "MiddleName",
+						"type": "String"
+					},
+					{
+						"name": "LastName",
+						"type": "String"
+					},
+					{
+						"name": "Suffix",
+						"type": "String"
+					},
+					{
+						"name": "CompanyName",
+						"type": "String"
+					},
+					{
+						"name": "SalesPerson",
+						"type": "String"
+					},
+					{
+						"name": "EmailAddress",
+						"type": "String"
+					},
+					{
+						"name": "Phone",
+						"type": "String"
+					},
+					{
+						"name": "PasswordHash",
+						"type": "String"
+					},
+					{
+						"name": "PasswordSalt",
+						"type": "String"
+					},
+					{
+						"name": "rowguid",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/cabrantesdatalake_service')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DimCustomerSQLPool')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "cabrantesworkspace_sqlpool_service",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "CustomerID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "CompanyName",
+						"type": "varchar"
+					},
+					{
+						"name": "SalesPerson",
+						"type": "varchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "DimCustomer"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/cabrantesworkspace_sqlpool_service')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DimCustomerTable')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "cabrantesworkspace_sqlpool_service",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "CustomerSK",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "CustomerID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "CompanyName",
+						"type": "varchar"
+					},
+					{
+						"name": "SalesPerson",
+						"type": "varchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "DimCustomer"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/cabrantesworkspace_sqlpool_service')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DimProduct')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "cabrantesworkspace_sqlpool_service",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "ProductSK",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "ProductID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "ProductModelID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "ProductcategoryID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "ProductName",
+						"type": "varchar"
+					},
+					{
+						"name": "ProductModelName",
+						"type": "varchar"
+					},
+					{
+						"name": "ProductCategoryName",
+						"type": "varchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "DimProduct"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/cabrantesworkspace_sqlpool_service')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/FactSales_Table')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "cabrantesworkspace_sqlpool_service",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "ProductID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "SalesOrderID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "CustomerID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "OrderQty",
+						"type": "smallint",
+						"precision": 5
+					},
+					{
+						"name": "UnitPrice",
+						"type": "money",
+						"precision": 19,
+						"scale": 4
+					},
+					{
+						"name": "OrderDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "TaxAmt",
+						"type": "money",
+						"precision": 19,
+						"scale": 4
+					},
+					{
+						"name": "TotalAmount",
+						"type": "money",
+						"precision": 19,
+						"scale": 4
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "FactSales"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/cabrantesworkspace_sqlpool_service')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/FileServer')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "appvm_server",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "FileServerLocation",
+						"fileName": "access.log"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/appvm_server')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/LogDataJson')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "cabrantesdatalake_service",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Json",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileSystem": "json"
+					}
+				},
+				"schema": {}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/cabrantesdatalake_service')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Parquet1')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "cabrantesdatalake_service",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileSystem": "parquet"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/cabrantesdatalake_service')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ProductCategoryTable')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "appdb_service",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "ProductCategoryID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "ParentProductCategoryID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "Name",
+						"type": "nvarchar"
+					},
+					{
+						"name": "rowguid",
+						"type": "uniqueidentifier"
+					},
+					{
+						"name": "ModifiedDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "SalesLT",
+					"table": "ProductCategory"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/appdb_service')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ProductModelTable')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "appdb_service",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "ProductModelID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "Name",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CatalogDescription",
+						"type": "xml"
+					},
+					{
+						"name": "rowguid",
+						"type": "uniqueidentifier"
+					},
+					{
+						"name": "ModifiedDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "SalesLT",
+					"table": "ProductModel"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/appdb_service')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ProductTable')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "appdb_service",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "ProductID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "Name",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ProductNumber",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Color",
+						"type": "nvarchar"
+					},
+					{
+						"name": "StandardCost",
+						"type": "money",
+						"precision": 19,
+						"scale": 4
+					},
+					{
+						"name": "ListPrice",
+						"type": "money",
+						"precision": 19,
+						"scale": 4
+					},
+					{
+						"name": "Size",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Weight",
+						"type": "decimal",
+						"precision": 8,
+						"scale": 2
+					},
+					{
+						"name": "ProductCategoryID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "ProductModelID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "SellStartDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "SellEndDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "DiscontinuedDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "ThumbNailPhoto",
+						"type": "varbinary"
+					},
+					{
+						"name": "ThumbnailPhotoFileName",
+						"type": "nvarchar"
+					},
+					{
+						"name": "rowguid",
+						"type": "uniqueidentifier"
+					},
+					{
+						"name": "ModifiedDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "SalesLT",
+					"table": "Product"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/appdb_service')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SalesOrderDetail_Table')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "appdb_service",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "SalesOrderID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "SalesOrderDetailID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "OrderQty",
+						"type": "smallint",
+						"precision": 5
+					},
+					{
+						"name": "ProductID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "UnitPrice",
+						"type": "money",
+						"precision": 19,
+						"scale": 4
+					},
+					{
+						"name": "UnitPriceDiscount",
+						"type": "money",
+						"precision": 19,
+						"scale": 4
+					},
+					{
+						"name": "LineTotal",
+						"type": "decimal",
+						"precision": 38,
+						"scale": 6
+					},
+					{
+						"name": "rowguid",
+						"type": "uniqueidentifier"
+					},
+					{
+						"name": "ModifiedDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "SalesLT",
+					"table": "SalesOrderDetail"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/appdb_service')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SalesOrderHeader_Table')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "appdb_service",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "SalesOrderID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "RevisionNumber",
+						"type": "tinyint",
+						"precision": 3
+					},
+					{
+						"name": "OrderDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "DueDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "ShipDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "Status",
+						"type": "tinyint",
+						"precision": 3
+					},
+					{
+						"name": "OnlineOrderFlag",
+						"type": "bit"
+					},
+					{
+						"name": "SalesOrderNumber",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PurchaseOrderNumber",
+						"type": "nvarchar"
+					},
+					{
+						"name": "AccountNumber",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CustomerID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "ShipToAddressID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "BillToAddressID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "ShipMethod",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CreditCardApprovalCode",
+						"type": "varchar"
+					},
+					{
+						"name": "SubTotal",
+						"type": "money",
+						"precision": 19,
+						"scale": 4
+					},
+					{
+						"name": "TaxAmt",
+						"type": "money",
+						"precision": 19,
+						"scale": 4
+					},
+					{
+						"name": "Freight",
+						"type": "money",
+						"precision": 19,
+						"scale": 4
+					},
+					{
+						"name": "TotalDue",
+						"type": "money",
+						"precision": 19,
+						"scale": 4
+					},
+					{
+						"name": "Comment",
+						"type": "nvarchar"
+					},
+					{
+						"name": "rowguid",
+						"type": "uniqueidentifier"
+					},
+					{
+						"name": "ModifiedDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "SalesLT",
+					"table": "SalesOrderHeader"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/appdb_service')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ServerLogs_Table')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "cabrantesworkspace_sqlpool_service",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "Remote_addr",
+						"type": "varchar"
+					},
+					{
+						"name": "Time_local",
+						"type": "varchar"
+					},
+					{
+						"name": "Request",
+						"type": "varchar"
+					},
+					{
+						"name": "Status",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "Bytes",
+						"type": "int",
+						"precision": 10
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "Serverlogs"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/cabrantesworkspace_sqlpool_service')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SourceDataset_v1k')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "appdb_service",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "ProductID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "SalesOrderID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "OrderQty",
+						"type": "smallint",
+						"precision": 5
+					},
+					{
+						"name": "UnitPrice",
+						"type": "money",
+						"precision": 19,
+						"scale": 4
+					},
+					{
+						"name": "OrderDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "CustomerID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "TaxAmt",
+						"type": "money",
+						"precision": 19,
+						"scale": 4
+					}
+				],
+				"typeProperties": {}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/appdb_service')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SourceDataset_yg8')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "cabrantesdatalake_service",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "Log.csv",
+						"fileSystem": "csv"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "Correlation id",
+						"type": "String"
+					},
+					{
+						"name": "Operation name",
+						"type": "String"
+					},
+					{
+						"name": "Status",
+						"type": "String"
+					},
+					{
+						"name": "Event category",
+						"type": "String"
+					},
+					{
+						"name": "Level",
+						"type": "String"
+					},
+					{
+						"name": "Time",
+						"type": "String"
+					},
+					{
+						"name": "Subscription",
+						"type": "String"
+					},
+					{
+						"name": "Event initiated by",
+						"type": "String"
+					},
+					{
+						"name": "Resource type",
+						"type": "String"
+					},
+					{
+						"name": "Resource group",
+						"type": "String"
+					},
+					{
+						"name": "Resource",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/cabrantesdatalake_service')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/accesslog')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "cabrantesdatalake_service",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "access.log",
+						"fileSystem": "nginx"
+					},
+					"columnDelimiter": {
+						"value": " ",
+						"type": "Expression"
+					},
+					"escapeChar": "\\",
+					"firstRowAsHeader": false,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/cabrantesdatalake_service')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dedicatedsqlpool_logdata_parquet')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "cabrantesworkspace_sqlpool_service",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "Correlationid",
+						"type": "varchar"
+					},
+					{
+						"name": "Operationname",
+						"type": "varchar"
+					},
+					{
+						"name": "Status",
+						"type": "varchar"
+					},
+					{
+						"name": "Eventcategory",
+						"type": "varchar"
+					},
+					{
+						"name": "Level",
+						"type": "varchar"
+					},
+					{
+						"name": "Time",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "Subscription",
+						"type": "varchar"
+					},
+					{
+						"name": "Eventinitiatedby",
+						"type": "varchar"
+					},
+					{
+						"name": "Resourcetype",
+						"type": "varchar"
+					},
+					{
+						"name": "Resourcegroup",
+						"type": "varchar"
+					},
+					{
+						"name": "Resource",
+						"type": "varchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "logdata_parquet"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/cabrantesworkspace_sqlpool_service')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/logdata_parquet')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "cabrantesdatalake_service",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "Log.parquet",
+						"fileSystem": "parquet"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": [
+					{
+						"name": "Correlationid",
+						"type": "UTF8"
+					},
+					{
+						"name": "Operationname",
+						"type": "UTF8"
+					},
+					{
+						"name": "Status",
+						"type": "UTF8"
+					},
+					{
+						"name": "Eventcategory",
+						"type": "UTF8"
+					},
+					{
+						"name": "Level",
+						"type": "UTF8"
+					},
+					{
+						"name": "Time",
+						"type": "INT96"
+					},
+					{
+						"name": "Subscription",
+						"type": "UTF8"
+					},
+					{
+						"name": "Eventinitiatedby",
+						"type": "UTF8"
+					},
+					{
+						"name": "Resourcetype",
+						"type": "UTF8"
+					},
+					{
+						"name": "Resourcegroup",
+						"type": "UTF8"
+					},
+					{
+						"name": "Resource",
+						"type": "UTF8"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/cabrantesdatalake_service')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/appdb_service')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"connectionString": "[parameters('appdb_service_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/appvm_server')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "FileServer",
+				"typeProperties": {
+					"host": "[parameters('appvm_server_properties_typeProperties_host')]",
+					"userId": "[parameters('appvm_server_properties_typeProperties_userId')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('appvm_server_password')]"
+					}
+				},
+				"connectVia": {
+					"referenceName": "appvmRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/appvmRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/cabrantesdatalake_service')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('cabrantesdatalake_service_properties_typeProperties_url')]",
+					"accountKey": {
+						"type": "SecureString",
+						"value": "[parameters('cabrantesdatalake_service_accountKey')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/cabrantesworkspace_sqlpool_service')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDW",
+				"typeProperties": {
+					"connectionString": "[parameters('cabrantesworkspace_sqlpool_service_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/appvmRuntime')]",
+			"type": "Microsoft.DataFactory/factories/integrationRuntimes",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "SelfHosted",
+				"typeProperties": {}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/01_DataFlow_FactSales')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "SalesOrderDetail_Table",
+								"type": "DatasetReference"
+							},
+							"name": "SalesOrderDetailStream"
+						},
+						{
+							"dataset": {
+								"referenceName": "SalesOrderHeader_Table",
+								"type": "DatasetReference"
+							},
+							"name": "SalesOrderHeaderStream"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "FactSales_Table",
+								"type": "DatasetReference"
+							},
+							"name": "FactSalesStream"
+						}
+					],
+					"transformations": [
+						{
+							"name": "SalesOrderDetailJoinSalesOrderHeader"
+						},
+						{
+							"name": "SelectColumnsStream"
+						},
+						{
+							"name": "TotalAmountStream"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          SalesOrderID as integer,",
+						"          SalesOrderDetailID as integer,",
+						"          OrderQty as integer,",
+						"          ProductID as integer,",
+						"          UnitPrice as decimal(19,4),",
+						"          UnitPriceDiscount as decimal(19,4),",
+						"          LineTotal as decimal(38,6),",
+						"          rowguid as string,",
+						"          ModifiedDate as timestamp",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> SalesOrderDetailStream",
+						"source(output(",
+						"          SalesOrderID as integer,",
+						"          RevisionNumber as integer,",
+						"          OrderDate as timestamp,",
+						"          DueDate as timestamp,",
+						"          ShipDate as timestamp,",
+						"          Status as integer,",
+						"          OnlineOrderFlag as boolean,",
+						"          SalesOrderNumber as string,",
+						"          PurchaseOrderNumber as string,",
+						"          AccountNumber as string,",
+						"          CustomerID as integer,",
+						"          ShipToAddressID as integer,",
+						"          BillToAddressID as integer,",
+						"          ShipMethod as string,",
+						"          CreditCardApprovalCode as string,",
+						"          SubTotal as decimal(19,4),",
+						"          TaxAmt as decimal(19,4),",
+						"          Freight as decimal(19,4),",
+						"          TotalDue as decimal(19,4),",
+						"          Comment as string,",
+						"          rowguid as string,",
+						"          ModifiedDate as timestamp",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> SalesOrderHeaderStream",
+						"SalesOrderDetailStream, SalesOrderHeaderStream join(SalesOrderDetailStream@SalesOrderID == SalesOrderHeaderStream@SalesOrderID,",
+						"     joinType:'left',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     broadcast: 'auto')~> SalesOrderDetailJoinSalesOrderHeader",
+						"SalesOrderDetailJoinSalesOrderHeader select(mapColumn(",
+						"          SalesOrderID = SalesOrderDetailStream@SalesOrderID,",
+						"          OrderQty,",
+						"          ProductID,",
+						"          UnitPrice,",
+						"          CustomerID,",
+						"          TaxAmt,",
+						"          OrderDate",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> SelectColumnsStream",
+						"SelectColumnsStream derive(TotalAmount = multiply(OrderQty, UnitPrice)) ~> TotalAmountStream",
+						"TotalAmountStream sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          ProductID as integer,",
+						"          SalesOrderID as integer,",
+						"          CustomerID as integer,",
+						"          OrderQty as integer,",
+						"          UnitPrice as decimal(19,4),",
+						"          OrderDate as timestamp,",
+						"          TaxAmt as decimal(19,4),",
+						"          TotalAmount as decimal(19,4)",
+						"     ),",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     format: 'table',",
+						"     staged: true,",
+						"     allowCopyCommand: true,",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError',",
+						"     mapColumn(",
+						"          ProductID,",
+						"          SalesOrderID,",
+						"          CustomerID,",
+						"          OrderQty,",
+						"          UnitPrice,",
+						"          OrderDate,",
+						"          TaxAmt,",
+						"          TotalAmount",
+						"     )) ~> FactSalesStream"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/SalesOrderDetail_Table')]",
+				"[concat(variables('factoryId'), '/datasets/SalesOrderHeader_Table')]",
+				"[concat(variables('factoryId'), '/datasets/FactSales_Table')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/02_DataFlow_Dim')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "CustomerCSV",
+								"type": "DatasetReference"
+							},
+							"name": "CustomerStream"
+						},
+						{
+							"dataset": {
+								"referenceName": "ProductTable",
+								"type": "DatasetReference"
+							},
+							"name": "ProductStream"
+						},
+						{
+							"dataset": {
+								"referenceName": "ProductModelTable",
+								"type": "DatasetReference"
+							},
+							"name": "ProductModelStream"
+						},
+						{
+							"dataset": {
+								"referenceName": "ProductCategoryTable",
+								"type": "DatasetReference"
+							},
+							"name": "ProductCategoryStream"
+						},
+						{
+							"dataset": {
+								"referenceName": "DimCustomerTable",
+								"type": "DatasetReference"
+							},
+							"name": "GetMaxCustomerSK"
+						},
+						{
+							"dataset": {
+								"referenceName": "DimProduct",
+								"type": "DatasetReference"
+							},
+							"name": "DimProductLatest"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "DimCustomerTable",
+								"type": "DatasetReference"
+							},
+							"name": "DimCustomer"
+						},
+						{
+							"dataset": {
+								"referenceName": "DimProduct",
+								"type": "DatasetReference"
+							},
+							"name": "DimProductStream"
+						},
+						{
+							"name": "CustomerSKSink"
+						}
+					],
+					"transformations": [
+						{
+							"name": "ProductJoinProductModel"
+						},
+						{
+							"name": "JoinProductCategory"
+						},
+						{
+							"name": "SelectColumnsProduct"
+						},
+						{
+							"name": "ProductSKStream"
+						},
+						{
+							"name": "SelectColumnsCustomer"
+						},
+						{
+							"name": "CustomerSK"
+						},
+						{
+							"name": "CustomerSKUpdated"
+						},
+						{
+							"name": "DoesProductExists"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          CustomerID as string,",
+						"          NameStyle as string,",
+						"          Title as string,",
+						"          FirstName as string,",
+						"          MiddleName as string,",
+						"          LastName as string,",
+						"          Suffix as string,",
+						"          CompanyName as string,",
+						"          SalesPerson as string,",
+						"          EmailAddress as string,",
+						"          Phone as string,",
+						"          PasswordHash as string,",
+						"          PasswordSalt as string,",
+						"          rowguid as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> CustomerStream",
+						"source(output(",
+						"          ProductID as integer,",
+						"          Name as string,",
+						"          ProductNumber as string,",
+						"          Color as string,",
+						"          StandardCost as decimal(19,4),",
+						"          ListPrice as decimal(19,4),",
+						"          Size as string,",
+						"          Weight as decimal(8,2),",
+						"          ProductCategoryID as integer,",
+						"          ProductModelID as integer,",
+						"          SellStartDate as timestamp,",
+						"          SellEndDate as timestamp,",
+						"          DiscontinuedDate as timestamp,",
+						"          ThumbNailPhoto as binary,",
+						"          ThumbnailPhotoFileName as string,",
+						"          rowguid as string,",
+						"          ModifiedDate as timestamp",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> ProductStream",
+						"source(output(",
+						"          ProductModelID as integer,",
+						"          Name as string,",
+						"          CatalogDescription as string,",
+						"          rowguid as string,",
+						"          ModifiedDate as timestamp",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> ProductModelStream",
+						"source(output(",
+						"          ProductCategoryID as integer,",
+						"          ParentProductCategoryID as integer,",
+						"          Name as string,",
+						"          rowguid as string,",
+						"          ModifiedDate as timestamp",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> ProductCategoryStream",
+						"source(output(",
+						"          CustomerSK as integer",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     query: 'SELECT MAX([CustomerSK]) as CustomerSK FROM [dbo].[DimCustomer]',",
+						"     format: 'query',",
+						"     staged: true) ~> GetMaxCustomerSK",
+						"source(output(",
+						"          ProductSK as integer,",
+						"          ProductID as integer,",
+						"          ProductModelID as integer,",
+						"          ProductcategoryID as integer,",
+						"          ProductName as string,",
+						"          ProductModelName as string,",
+						"          ProductCategoryName as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table',",
+						"     staged: true) ~> DimProductLatest",
+						"DoesProductExists, ProductModelStream join(ProductStream@ProductModelID == ProductModelStream@ProductModelID,",
+						"     joinType:'left',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     broadcast: 'auto')~> ProductJoinProductModel",
+						"ProductJoinProductModel, ProductCategoryStream join(ProductStream@ProductCategoryID == ProductCategoryStream@ProductCategoryID,",
+						"     joinType:'left',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     broadcast: 'auto')~> JoinProductCategory",
+						"JoinProductCategory select(mapColumn(",
+						"          ProductID,",
+						"          ProductName = ProductStream@Name,",
+						"          ProductCategoryID = ProductStream@ProductCategoryID,",
+						"          ProductModelID = ProductStream@ProductModelID,",
+						"          ProductModelName = ProductModelStream@Name,",
+						"          ProductCategoryName = ProductCategoryStream@Name",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> SelectColumnsProduct",
+						"SelectColumnsProduct keyGenerate(output(ProductSK as long),",
+						"     startAt: 1L,",
+						"     stepValue: 1L) ~> ProductSKStream",
+						"CustomerStream select(mapColumn(",
+						"          CustomerID,",
+						"          CompanyName,",
+						"          SalesPerson",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> SelectColumnsCustomer",
+						"SelectColumnsCustomer keyGenerate(output(CustomerSK as long),",
+						"     startAt: 1L,",
+						"     stepValue: 1L) ~> CustomerSK",
+						"CustomerSK derive(CustomerSK = CustomerSK + CustomerSKSink#outputs()[1].CustomerSK) ~> CustomerSKUpdated",
+						"ProductStream, DimProductLatest exists(ProductStream@ProductID == DimProductLatest@ProductID,",
+						"     negate:true,",
+						"     broadcast: 'both')~> DoesProductExists",
+						"CustomerSKUpdated sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          CustomerSK as integer,",
+						"          CustomerID as integer,",
+						"          CompanyName as string,",
+						"          SalesPerson as string",
+						"     ),",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     format: 'table',",
+						"     staged: true,",
+						"     allowCopyCommand: true,",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError',",
+						"     mapColumn(",
+						"          CustomerSK,",
+						"          CustomerID,",
+						"          CompanyName,",
+						"          SalesPerson",
+						"     )) ~> DimCustomer",
+						"ProductSKStream sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          ProductSK as integer,",
+						"          ProductID as integer,",
+						"          ProductModelID as integer,",
+						"          ProductcategoryID as integer,",
+						"          ProductName as string,",
+						"          ProductModelName as string,",
+						"          ProductCategoryName as string",
+						"     ),",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     format: 'table',",
+						"     staged: true,",
+						"     allowCopyCommand: true,",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError',",
+						"     mapColumn(",
+						"          ProductSK,",
+						"          ProductID,",
+						"          ProductModelID,",
+						"          ProductcategoryID = ProductCategoryID,",
+						"          ProductName,",
+						"          ProductModelName,",
+						"          ProductCategoryName",
+						"     )) ~> DimProductStream",
+						"GetMaxCustomerSK sink(validateSchema: false,",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     store: 'cache',",
+						"     format: 'inline',",
+						"     output: false,",
+						"     saveOrder: 1,",
+						"     mapColumn(",
+						"          CustomerSK",
+						"     )) ~> CustomerSKSink"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/CustomerCSV')]",
+				"[concat(variables('factoryId'), '/datasets/ProductTable')]",
+				"[concat(variables('factoryId'), '/datasets/ProductModelTable')]",
+				"[concat(variables('factoryId'), '/datasets/ProductCategoryTable')]",
+				"[concat(variables('factoryId'), '/datasets/DimCustomerTable')]",
+				"[concat(variables('factoryId'), '/datasets/DimProduct')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/03_DataFlow_logdata')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "logdata_parquet",
+								"type": "DatasetReference"
+							},
+							"name": "LogdataParquetStream"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "dedicatedsqlpool_logdata_parquet",
+								"type": "DatasetReference"
+							},
+							"name": "logdataparquetpooldbstream"
+						}
+					],
+					"transformations": [
+						{
+							"name": "FilterNullValues"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          Correlationid as string,",
+						"          Operationname as string,",
+						"          Status as string,",
+						"          Eventcategory as string,",
+						"          Level as string,",
+						"          Time as timestamp,",
+						"          Subscription as string,",
+						"          Eventinitiatedby as string,",
+						"          Resourcetype as string,",
+						"          Resourcegroup as string,",
+						"          Resource as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false,",
+						"     format: 'parquet') ~> LogdataParquetStream",
+						"LogdataParquetStream filter(!(isNull({Resourcegroup}))) ~> FilterNullValues",
+						"FilterNullValues sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          Correlationid as string,",
+						"          Operationname as string,",
+						"          Status as string,",
+						"          Eventcategory as string,",
+						"          Level as string,",
+						"          Time as timestamp,",
+						"          Subscription as string,",
+						"          Eventinitiatedby as string,",
+						"          Resourcetype as string,",
+						"          Resourcegroup as string,",
+						"          Resource as string",
+						"     ),",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     format: 'table',",
+						"     staged: true,",
+						"     allowCopyCommand: true,",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError',",
+						"     mapColumn(",
+						"          Correlationid,",
+						"          Operationname,",
+						"          Status,",
+						"          Eventcategory,",
+						"          Level,",
+						"          Time,",
+						"          Subscription,",
+						"          Eventinitiatedby,",
+						"          Resourcetype,",
+						"          Resourcegroup,",
+						"          Resource",
+						"     )) ~> logdataparquetpooldbstream"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/logdata_parquet')]",
+				"[concat(variables('factoryId'), '/datasets/dedicatedsqlpool_logdata_parquet')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/04_DataFlow_JSON')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "logdata_parquet",
+								"type": "DatasetReference"
+							},
+							"name": "LogParquetStream"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "LogDataJson",
+								"type": "DatasetReference"
+							},
+							"name": "JsonStream"
+						}
+					],
+					"transformations": [],
+					"scriptLines": [
+						"source(output(",
+						"          Correlationid as string,",
+						"          Operationname as string,",
+						"          Status as string,",
+						"          Eventcategory as string,",
+						"          Level as string,",
+						"          Time as timestamp,",
+						"          Subscription as string,",
+						"          Eventinitiatedby as string,",
+						"          Resourcetype as string,",
+						"          Resourcegroup as string,",
+						"          Resource as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false,",
+						"     format: 'parquet') ~> LogParquetStream",
+						"LogParquetStream sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     partitionFileNames:['log.json'],",
+						"     umask: 0022,",
+						"     preCommands: [],",
+						"     postCommands: [],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     partitionBy('hash', 1)) ~> JsonStream"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/logdata_parquet')]",
+				"[concat(variables('factoryId'), '/datasets/LogDataJson')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/05-DataFlow_JsonArrays')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "CustomerJson",
+								"type": "DatasetReference"
+							},
+							"name": "CustomerSourceJson"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "CustomerJsonTable",
+								"type": "DatasetReference"
+							},
+							"name": "CustomerSQLPool"
+						}
+					],
+					"transformations": [
+						{
+							"name": "FlattenJsonCourse"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          customerid as integer,",
+						"          customername as string,",
+						"          registered as boolean,",
+						"          courses as string[],",
+						"          details as (mobile as string, city as string)",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false,",
+						"     documentForm: 'arrayOfDocuments') ~> CustomerSourceJson",
+						"CustomerSourceJson foldDown(unroll(courses),",
+						"     mapColumn(",
+						"          customerid,",
+						"          customername,",
+						"          registered,",
+						"          courses,",
+						"          mobile = details.mobile,",
+						"          city = details.city",
+						"     ),",
+						"     skipDuplicateMapInputs: false,",
+						"     skipDuplicateMapOutputs: false) ~> FlattenJsonCourse",
+						"FlattenJsonCourse sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          CustomerID as integer,",
+						"          CustomerName as string,",
+						"          Registered as boolean,",
+						"          Courses as string,",
+						"          Mobile as string,",
+						"          City as string",
+						"     ),",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     format: 'table',",
+						"     staged: true,",
+						"     allowCopyCommand: true,",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError',",
+						"     mapColumn(",
+						"          CustomerID = customerid,",
+						"          CustomerName = customername,",
+						"          Registered = registered,",
+						"          Courses = courses,",
+						"          Mobile = mobile,",
+						"          City = city",
+						"     )) ~> CustomerSQLPool"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/CustomerJson')]",
+				"[concat(variables('factoryId'), '/datasets/CustomerJsonTable')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dataflow1')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "DelimitedText1",
+								"type": "DatasetReference"
+							},
+							"name": "source1"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "Parquet1",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [],
+					"scriptLines": [
+						"source(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> source1",
+						"source1 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     format: 'parquet',",
+						"     umask: 0022,",
+						"     preCommands: [],",
+						"     postCommands: [],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> sink1"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/DelimitedText1')]",
+				"[concat(variables('factoryId'), '/datasets/Parquet1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dataflow_nginx')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "accesslog",
+								"type": "DatasetReference"
+							},
+							"name": "nginxstream"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "ServerLogs_Table",
+								"type": "DatasetReference"
+							},
+							"name": "ServerLogsStream"
+						}
+					],
+					"transformations": [
+						{
+							"name": "select1"
+						},
+						{
+							"name": "derivedTimeColumn"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          {_col0_} as string,",
+						"          {_col1_} as string,",
+						"          {_col2_} as string,",
+						"          {_col3_} as string,",
+						"          {_col4_} as string,",
+						"          {_col5_} as string,",
+						"          {_col6_} as short,",
+						"          {_col7_} as short,",
+						"          {_col8_} as string,",
+						"          {_col9_} as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> nginxstream",
+						"nginxstream select(mapColumn(",
+						"          Remote_addr = {_col0_},",
+						"          Time_local = {_col3_},",
+						"          Request = {_col5_},",
+						"          Status = {_col6_},",
+						"          Bytes = {_col7_}",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select1",
+						"select1 derive(Time_local = substring(Time_local, 2, length(Time_local)-1)) ~> derivedTimeColumn",
+						"derivedTimeColumn sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          Remote_addr as string,",
+						"          Time_local as string,",
+						"          Request as string,",
+						"          Status as integer,",
+						"          Bytes as integer",
+						"     ),",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     format: 'table',",
+						"     staged: true,",
+						"     allowCopyCommand: true,",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError',",
+						"     mapColumn(",
+						"          Remote_addr,",
+						"          Time_local,",
+						"          Request,",
+						"          Status,",
+						"          Bytes",
+						"     )) ~> ServerLogsStream"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/accesslog')]",
+				"[concat(variables('factoryId'), '/datasets/ServerLogs_Table')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dataflow_splitlogdata')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "logdata_parquet",
+								"type": "DatasetReference"
+							},
+							"name": "logparquestream"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "logdata_parquet",
+								"type": "DatasetReference"
+							},
+							"name": "logdatastream"
+						}
+					],
+					"transformations": [
+						{
+							"name": "splitresourcegroup"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          Correlationid as string,",
+						"          Operationname as string,",
+						"          Status as string,",
+						"          Eventcategory as string,",
+						"          Level as string,",
+						"          Time as timestamp,",
+						"          Subscription as string,",
+						"          Eventinitiatedby as string,",
+						"          Resourcetype as string,",
+						"          Resourcegroup as string,",
+						"          Resource as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false,",
+						"     format: 'parquet') ~> logparquestream",
+						"logparquestream split({Resourcegroup}=='app-grp',",
+						"     disjoint: false) ~> splitresourcegroup@(appgrpstream, otherresourcegroups)",
+						"splitresourcegroup@appgrpstream sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          Correlationid as string,",
+						"          Operationname as string,",
+						"          Status as string,",
+						"          Eventcategory as string,",
+						"          Level as string,",
+						"          Time as timestamp,",
+						"          Subscription as string,",
+						"          Eventinitiatedby as string,",
+						"          Resourcetype as string,",
+						"          Resourcegroup as string,",
+						"          Resource as string",
+						"     ),",
+						"     format: 'parquet',",
+						"     umask: 0022,",
+						"     preCommands: [],",
+						"     postCommands: [],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> logdatastream"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/logdata_parquet')]"
+			]
+		}
+	]
+}
