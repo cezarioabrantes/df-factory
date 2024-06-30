@@ -1,0 +1,57 @@
+{
+	"name": "08_DataFlow_Metrics",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "stagingmetricdataset",
+						"type": "DatasetReference"
+					},
+					"name": "stagingmetric"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "stagingoutput",
+						"type": "DatasetReference"
+					},
+					"name": "stagingoutputstream"
+				}
+			],
+			"transformations": [
+				{
+					"name": "SelectColumnStream"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          time as string,",
+				"          resourceId as string,",
+				"          category as string,",
+				"          properties as (CsMethod as string, CsUriStem as string, SPort as string, CIp as string, UserAgent as string, CsHost as string, ScStatus as integer, ScSubStatus as string, ScWin32Status as string, ScBytes as integer, CsBytes as integer, TimeTaken as integer, Result as string, Cookie as string, CsUriQuery as string, CsUsername as string, Referer as string, ComputerName as string)",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     documentForm: 'documentPerLine') ~> stagingmetric",
+				"stagingmetric select(mapColumn(",
+				"          time,",
+				"          resourceId,",
+				"          category",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> SelectColumnStream",
+				"SelectColumnStream sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> stagingoutputstream"
+			]
+		}
+	}
+}

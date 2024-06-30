@@ -1,0 +1,90 @@
+{
+	"name": "stagingmetricdataset",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "cabrantesdatalake_service",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileSystem": "stagingmetric"
+			}
+		},
+		"schema": {
+			"type": "object",
+			"properties": {
+				"time": {
+					"type": "string"
+				},
+				"resourceId": {
+					"type": "string"
+				},
+				"category": {
+					"type": "string"
+				},
+				"properties": {
+					"type": "object",
+					"properties": {
+						"CsMethod": {
+							"type": "string"
+						},
+						"CsUriStem": {
+							"type": "string"
+						},
+						"SPort": {
+							"type": "string"
+						},
+						"CIp": {
+							"type": "string"
+						},
+						"UserAgent": {
+							"type": "string"
+						},
+						"CsHost": {
+							"type": "string"
+						},
+						"ScStatus": {
+							"type": "integer"
+						},
+						"ScSubStatus": {
+							"type": "string"
+						},
+						"ScWin32Status": {
+							"type": "string"
+						},
+						"ScBytes": {
+							"type": "integer"
+						},
+						"CsBytes": {
+							"type": "integer"
+						},
+						"TimeTaken": {
+							"type": "integer"
+						},
+						"Result": {
+							"type": "string"
+						},
+						"Cookie": {
+							"type": "string"
+						},
+						"CsUriQuery": {
+							"type": "string"
+						},
+						"CsUsername": {
+							"type": "string"
+						},
+						"Referer": {
+							"type": "string"
+						},
+						"ComputerName": {
+							"type": "string"
+						}
+					}
+				}
+			}
+		}
+	}
+}
