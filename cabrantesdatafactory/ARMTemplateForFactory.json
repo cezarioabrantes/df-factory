@@ -3370,6 +3370,124 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/stagingmetricdataset')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "cabrantesdatalake_service",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Json",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileSystem": "stagingmetric"
+					}
+				},
+				"schema": {
+					"type": "object",
+					"properties": {
+						"time": {
+							"type": "string"
+						},
+						"resourceId": {
+							"type": "string"
+						},
+						"category": {
+							"type": "string"
+						},
+						"properties": {
+							"type": "object",
+							"properties": {
+								"CsMethod": {
+									"type": "string"
+								},
+								"CsUriStem": {
+									"type": "string"
+								},
+								"SPort": {
+									"type": "string"
+								},
+								"CIp": {
+									"type": "string"
+								},
+								"UserAgent": {
+									"type": "string"
+								},
+								"CsHost": {
+									"type": "string"
+								},
+								"ScStatus": {
+									"type": "integer"
+								},
+								"ScSubStatus": {
+									"type": "string"
+								},
+								"ScWin32Status": {
+									"type": "string"
+								},
+								"ScBytes": {
+									"type": "integer"
+								},
+								"CsBytes": {
+									"type": "integer"
+								},
+								"TimeTaken": {
+									"type": "integer"
+								},
+								"Result": {
+									"type": "string"
+								},
+								"Cookie": {
+									"type": "string"
+								},
+								"CsUriQuery": {
+									"type": "string"
+								},
+								"CsUsername": {
+									"type": "string"
+								},
+								"Referer": {
+									"type": "string"
+								},
+								"ComputerName": {
+									"type": "string"
+								}
+							}
+						}
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/cabrantesdatalake_service')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/stagingoutput')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "cabrantesdatalake_service",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Json",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileSystem": "stagingoutput"
+					}
+				},
+				"schema": {}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/cabrantesdatalake_service')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/appdb_service')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -4134,6 +4252,69 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/08_DataFlow_Metrics')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "stagingmetricdataset",
+								"type": "DatasetReference"
+							},
+							"name": "stagingmetric"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "stagingoutput",
+								"type": "DatasetReference"
+							},
+							"name": "stagingoutputstream"
+						}
+					],
+					"transformations": [
+						{
+							"name": "SelectColumnStream"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          time as string,",
+						"          resourceId as string,",
+						"          category as string,",
+						"          properties as (CsMethod as string, CsUriStem as string, SPort as string, CIp as string, UserAgent as string, CsHost as string, ScStatus as integer, ScSubStatus as string, ScWin32Status as string, ScBytes as integer, CsBytes as integer, TimeTaken as integer, Result as string, Cookie as string, CsUriQuery as string, CsUsername as string, Referer as string, ComputerName as string)",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false,",
+						"     documentForm: 'documentPerLine') ~> stagingmetric",
+						"stagingmetric select(mapColumn(",
+						"          time,",
+						"          resourceId,",
+						"          category",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> SelectColumnStream",
+						"SelectColumnStream sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     umask: 0022,",
+						"     preCommands: [],",
+						"     postCommands: [],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> stagingoutputstream"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/stagingmetricdataset')]",
+				"[concat(variables('factoryId'), '/datasets/stagingoutput')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/dataflow1')]",
 			"type": "Microsoft.DataFactory/factories/dataflows",
 			"apiVersion": "2018-06-01",
@@ -4349,6 +4530,41 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/logdata_parquet')]"
 			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pipeline1')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Data flow1",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": []
 		}
 	]
 }

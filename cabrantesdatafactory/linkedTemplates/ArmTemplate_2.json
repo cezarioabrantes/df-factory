@@ -13,6 +13,263 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/13-Metadata')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "GetMetadataBlobs",
+						"type": "GetMetadata",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataset": {
+								"referenceName": "DimCustomerCSVMetadata",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"fieldList": [
+								"childItems"
+							],
+							"storeSettings": {
+								"type": "AzureBlobFSReadSettings",
+								"recursive": true,
+								"enablePartitionDiscovery": false
+							},
+							"formatSettings": {
+								"type": "DelimitedTextReadSettings"
+							}
+						}
+					},
+					{
+						"name": "ForEachFile",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "GetMetadataBlobs",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('GetMetadataBlobs').output.childItems",
+								"type": "Expression"
+							},
+							"activities": [
+								{
+									"name": "CopyDimCustomer",
+									"type": "Copy",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "DelimitedTextSource",
+											"storeSettings": {
+												"type": "AzureBlobFSReadSettings",
+												"recursive": true,
+												"enablePartitionDiscovery": false
+											},
+											"formatSettings": {
+												"type": "DelimitedTextReadSettings"
+											}
+										},
+										"sink": {
+											"type": "SqlDWSink",
+											"writeBehavior": "Insert",
+											"sqlWriterUseTableLock": false
+										},
+										"enableStaging": false,
+										"translator": {
+											"type": "TabularTranslator",
+											"typeConversion": true,
+											"typeConversionSettings": {
+												"allowDataTruncation": true,
+												"treatBooleanAsNumber": false
+											}
+										}
+									},
+									"inputs": [
+										{
+											"referenceName": "DimCustomerCSVCopy",
+											"type": "DatasetReference",
+											"parameters": {
+												"filename": {
+													"value": "@item().Name",
+													"type": "Expression"
+												}
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "DimCustomerSQLPool",
+											"type": "DatasetReference",
+											"parameters": {}
+										}
+									]
+								}
+							]
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"variables": {
+					"CompanyName": {
+						"type": "String"
+					},
+					"SalesPerson": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"lastPublishTime": "2024-06-27T23:54:05Z"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/15-Lookup')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "LookupStoreProcedure",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlDWSource",
+								"sqlReaderStoredProcedureName": "[[dbo].[GetCustomerDetails]",
+								"storedProcedureParameters": {
+									"CustomerID": {
+										"type": "Int32",
+										"value": "277"
+									}
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "DimCustomerTable",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						}
+					},
+					{
+						"name": "VariableCompanyName",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "LookupStoreProcedure",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "CompanyName",
+							"value": {
+								"value": "@activity('LookupStoreProcedure').output.firstRow.CompanyName",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "VariableSalesPerson",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "LookupStoreProcedure",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "SalesPerson",
+							"value": {
+								"value": "@activity('LookupStoreProcedure').output.firstRow.SalesPerson",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"variables": {
+					"CompanyName": {
+						"type": "String"
+					},
+					"SalesPerson": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"lastPublishTime": "2024-06-27T23:39:57Z"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/FileServer')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "appvm_server",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "FileServerLocation",
+						"fileName": "access.log"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/01_DataFlow_FactSales')]",
 			"type": "Microsoft.DataFactory/factories/dataflows",
 			"apiVersion": "2018-06-01",
@@ -674,6 +931,66 @@
 						"          Mobile = mobile,",
 						"          City = city",
 						"     )) ~> CustomerSQLPool"
+					]
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/08_DataFlow_Metrics')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "stagingmetricdataset",
+								"type": "DatasetReference"
+							},
+							"name": "stagingmetric"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "stagingoutput",
+								"type": "DatasetReference"
+							},
+							"name": "stagingoutputstream"
+						}
+					],
+					"transformations": [
+						{
+							"name": "SelectColumnStream"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          time as string,",
+						"          resourceId as string,",
+						"          category as string,",
+						"          properties as (CsMethod as string, CsUriStem as string, SPort as string, CIp as string, UserAgent as string, CsHost as string, ScStatus as integer, ScSubStatus as string, ScWin32Status as string, ScBytes as integer, CsBytes as integer, TimeTaken as integer, Result as string, Cookie as string, CsUriQuery as string, CsUsername as string, Referer as string, ComputerName as string)",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false,",
+						"     documentForm: 'documentPerLine') ~> stagingmetric",
+						"stagingmetric select(mapColumn(",
+						"          time,",
+						"          resourceId,",
+						"          category",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> SelectColumnStream",
+						"SelectColumnStream sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     umask: 0022,",
+						"     preCommands: [],",
+						"     postCommands: [],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> stagingoutputstream"
 					]
 				}
 			},
@@ -1373,7 +1690,9 @@
 				"annotations": [],
 				"lastPublishTime": "2024-06-27T21:19:04Z"
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/FileServer')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/10-ConvertAccessLog')]",
