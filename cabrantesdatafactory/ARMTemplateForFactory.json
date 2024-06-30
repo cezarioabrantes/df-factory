@@ -1737,6 +1737,99 @@
 							},
 							"traceLevel": "Fine"
 						}
+					},
+					{
+						"name": "CopyDataSink",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "dfMetrics",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "JsonSource",
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true,
+									"wildcardFileName": "*.json",
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "JsonReadSettings"
+								}
+							},
+							"sink": {
+								"type": "AzureSqlSink",
+								"writeBehavior": "insert",
+								"sqlWriterUseTableLock": false
+							},
+							"enableStaging": true,
+							"stagingSettings": {
+								"linkedServiceName": {
+									"referenceName": "cabrantesdatalake_service",
+									"type": "LinkedServiceReference"
+								},
+								"path": "staging"
+							},
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"path": "$['time']"
+										},
+										"sink": {
+											"name": "time",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"path": "$['resourceId']"
+										},
+										"sink": {
+											"name": "resourceId",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['category']"
+										},
+										"sink": {
+											"name": "category",
+											"type": "String"
+										}
+									}
+								]
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "stagingoutput",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "WebMetrics",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
 					}
 				],
 				"policy": {
@@ -1745,7 +1838,10 @@
 				"annotations": []
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/dataflows/08_DataFlow_Metrics')]"
+				"[concat(variables('factoryId'), '/dataflows/08_DataFlow_Metrics')]",
+				"[concat(variables('factoryId'), '/datasets/stagingoutput')]",
+				"[concat(variables('factoryId'), '/datasets/WebMetrics')]",
+				"[concat(variables('factoryId'), '/linkedServices/cabrantesdatalake_service')]"
 			]
 		},
 		{
@@ -3213,6 +3309,42 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/cabrantesdatalake_service')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/WebMetrics')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "appdb_service",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "time",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "resourceId",
+						"type": "varchar"
+					},
+					{
+						"name": "category",
+						"type": "varchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "WebMetrics"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/appdb_service')]"
 			]
 		},
 		{
