@@ -26,9 +26,6 @@
 		"cabrantesdatalake_service_properties_typeProperties_url": {
 			"value": "https://cabrantesdatalakegen2.dfs.core.windows.net/"
 		},
-		"TriggerBlob_properties_typeProperties_scope": {
-			"value": "/subscriptions/e8edb32d-28d4-48b9-a3a5-6d2d02314dd5/resourceGroups/POM-RG-Training/providers/Microsoft.Storage/storageAccounts/cabrantesdatalakegen2"
-		},
 		"containerUri": {
 			"value": ""
 		},
