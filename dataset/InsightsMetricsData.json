@@ -1,0 +1,19 @@
+{
+	"name": "InsightsMetricsData",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "cabrantesdatalake_service",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": "resourceId=/SUBSCRIPTIONS/E8EDB32D-28D4-48B9-A3A5-6D2D02314DD5/RESOURCEGROUPS/APP-GRP/PROVIDERS/MICROSOFT.WEB/SITES/CABRANTESWEBAPP",
+				"fileSystem": "insights-logs-appservicehttplogs"
+			}
+		},
+		"schema": {}
+	}
+}
