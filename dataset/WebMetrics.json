@@ -1,0 +1,31 @@
+{
+	"name": "WebMetrics",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "appdb_service",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "time",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "resourceId",
+				"type": "varchar"
+			},
+			{
+				"name": "category",
+				"type": "varchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "WebMetrics"
+		}
+	}
+}
