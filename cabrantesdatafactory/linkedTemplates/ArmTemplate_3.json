@@ -6,6 +6,10 @@
 			"type": "string",
 			"metadata": "Data Factory name",
 			"defaultValue": "cabrantesdatafactory"
+		},
+		"TriggerBlob_properties_typeProperties_scope": {
+			"type": "string",
+			"defaultValue": "/subscriptions/e8edb32d-28d4-48b9-a3a5-6d2d02314dd5/resourceGroups/POM-RG-Training/providers/Microsoft.Storage/storageAccounts/cabrantesdatalakegen2"
 		}
 	},
 	"variables": {
@@ -182,6 +186,36 @@
 				"annotations": []
 			},
 			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/TriggerBlob')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Stopped",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "16-Metrics",
+							"type": "PipelineReference"
+						},
+						"parameters": {}
+					}
+				],
+				"type": "BlobEventsTrigger",
+				"typeProperties": {
+					"blobPathBeginsWith": "/stagingmetric/blobs/",
+					"ignoreEmptyBlobs": false,
+					"scope": "[parameters('TriggerBlob_properties_typeProperties_scope')]",
+					"events": [
+						"Microsoft.Storage.BlobCreated"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/16-Metrics')]"
+			]
 		}
 	]
 }

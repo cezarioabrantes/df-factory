@@ -35,6 +35,10 @@
 			"type": "string",
 			"defaultValue": "https://cabrantesdatalakegen2.dfs.core.windows.net/"
 		},
+		"TriggerBlob_properties_typeProperties_scope": {
+			"type": "string",
+			"defaultValue": "/subscriptions/e8edb32d-28d4-48b9-a3a5-6d2d02314dd5/resourceGroups/POM-RG-Training/providers/Microsoft.Storage/storageAccounts/cabrantesdatalakegen2"
+		},
 		"containerUri": {
 			"type": "string",
 			"metadata": "URI to storage account containing linked ARM templates"
@@ -140,6 +144,9 @@
 				"parameters": {
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
+					},
+					"TriggerBlob_properties_typeProperties_scope": {
+						"value": "[parameters('TriggerBlob_properties_typeProperties_scope')]"
 					}
 				}
 			},
